@@ -5,7 +5,11 @@ import {
   printSucccess,
   printHelp,
 } from "./services/log.service.js";
-import { TOKEN_DICTIONARY, saveKeyValue } from "./services/storage.service.js";
+import {
+  TOKEN_DICTIONARY,
+  getKeyValue,
+  saveKeyValue,
+} from "./services/storage.service.js";
 
 const saveToken = async (token) => {
   if (!token.length) {
@@ -21,9 +25,24 @@ const saveToken = async (token) => {
   }
 };
 
+const saveCity = async (city) => {
+  if (!city.length) {
+    printError("Token does not exist");
+    return;
+  }
+
+  try {
+    await saveKeyValue(TOKEN_DICTIONARY.city, city);
+    printSucccess("city saved successfully");
+  } catch (error) {
+    printError(error.message);
+  }
+};
+
 const getForecast = async () => {
   try {
-    const response = await getWeather(process.env.CITY ?? "Uzbekistan");
+    const city = process.env.CITY ?? (await getKeyValue(TOKEN_DICTIONARY.city));
+    const response = await getWeather(city ?? "Uzbekistan");
     console.log(response);
   } catch (error) {
     if (error?.response?.status == 404) {
@@ -40,15 +59,16 @@ const startCLI = () => {
   const args = getArgs(process.argv);
 
   if (args.h) {
-    printHelp();
+    return printHelp();
   }
   if (args.s) {
+    return saveCity(args.s);
   }
   if (args.t) {
     return saveToken(args.t);
   }
 
-  getForecast();
+  return getForecast();
 };
 
 startCLI();
