@@ -20,7 +20,6 @@ const getWeather = async (city) => {
     }
   );
 
-  console.log(data);
   return data;
 };
 
