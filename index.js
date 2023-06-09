@@ -1,9 +1,10 @@
 import getArgs from "./helpers/args.js";
-import { getWeather } from "./services/api.service.js";
+import { getIcon, getWeather } from "./services/api.service.js";
 import {
   printError,
   printSucccess,
   printHelp,
+  printWeather,
 } from "./services/log.service.js";
 import {
   TOKEN_DICTIONARY,
@@ -43,7 +44,7 @@ const getForecast = async () => {
   try {
     const city = process.env.CITY ?? (await getKeyValue(TOKEN_DICTIONARY.city));
     const response = await getWeather(city ?? "Uzbekistan");
-    console.log(response);
+    printWeather(response, getIcon(response.weather[0].icon));
   } catch (error) {
     if (error?.response?.status == 404) {
       printError("City not found");
